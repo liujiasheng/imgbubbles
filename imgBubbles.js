@@ -12,6 +12,7 @@ jQuery.fn.imgBubbles = function(options){
     }, options); //merge options with default settings
 
     var isLoading = false;
+    var bubbleIndex = 1;
     
     var getPicShowHeight = function(src, maxWidth, maxHeight) {
         var img = new Image();
@@ -71,7 +72,8 @@ jQuery.fn.imgBubbles = function(options){
             var $bubbleWrap = $(this);
             showLoading($bubbleWrap);
             var src = $bubbleWrap.attr('imgsrc');
-            var div = "<div id='imgBubbleExpand' class='imgBubbleExpand'></div>";
+            var divId = 'imgBubbleExpand-' + bubbleIndex ++;
+            var div = "<div id='" + divId + "' class='imgBubbleExpand'></div>";
             $('.imgBubbleExpand').remove();
             $('body').append(div);
 
@@ -86,6 +88,9 @@ jQuery.fn.imgBubbles = function(options){
             //show expand effect
             var expandEffect = function () {
                 hideLoading($bubbleWrap);
+                if ($('#'+divId).hasClass('hide')) {
+                    return;
+                }
                 //image's width and height to show
                 var picHeight = getPicShowHeight(src, setting.maxWidth, setting.maxHeight);
                 var picWidth = getPicShowWidth(src, setting.maxWidth, setting.maxHeight);
@@ -123,12 +128,15 @@ jQuery.fn.imgBubbles = function(options){
             img.onerror = function () { showFail($bubbleWrap) };
             img.src = src;
             
-            $('.imgBubbleExpand').html(img);
-
+            $('#'+divId).html(img);
+           
+            $(this).bind('mouseleave', function (event) {
+                $('#'+divId).addClass('hide');
+                hideLoading($(this));
+            });
+            
         });
-        $(this).bind('mouseleave', function (event) {
-            hideLoading($(this));
-        })
+        
     });
 
 };
