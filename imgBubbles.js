@@ -4,9 +4,13 @@ jQuery.fn.imgBubbles = function(options){
     var setting=$.extend({}, {
         maxWidth: 300,
         maxHeight: 300,
-        speed:'fast'
-    }, options); //merge options w/ default settings
+        speed:'fast',
+        showLoading: true, //show loading icon or not
+        loadingImgSrc: 'images/loading.gif'
+    }, options); //merge options with default settings
 
+    var isLoading = false;
+    
     var getPicShowHeight = function(src, maxWidth, maxHeight) {
         var img = new Image();
         img.src = src;
@@ -27,42 +31,73 @@ jQuery.fn.imgBubbles = function(options){
         }
         return picWidth;
     };
+    var showLoading = function () {
+        isLoading = true;
+        $('.imgBubbleLoading').show();
+    };
+    var hideLoading = function () {
+        isLoading = false;
+        $('.imgBubbleLoading').hide();
+    };
+    var showFail = function () {
+        
+    };
+    
+    if (setting.showLoading) {
+        var loadingDiv = '<div class="imgBubbleLoading" id="imgBubbleLoading" style="display: none; position: absolute"></div>';
+        $('body').append(loadingDiv);
+        var img = new Image();
+        img.src = setting.loadingImgSrc;
+        $('.imgBubbleLoading').html(img);
 
+        var GetMouse = function(event) {
+            var x = event.clientX - 8;
+            var y = event.clientY - 8;
+            document.getElementById("imgBubbleLoading").style.left = x + "px";
+            document.getElementById("imgBubbleLoading").style.top = y + "px";
+        };
+        $('body').bind('mousemove', function(event){
+            GetMouse(event);
+        });
+    }
+    
     $('.temp_pic_div').live('mouseleave', function () {
-        $(this).stop();
         $('.temp_pic_div').remove();
     });
 
     return this.each(function() { //return jQuery obj
 
-        $(this).live('mouseenter', function (event) {
-            var $bubblewrap = $(this);
-
-            var src = $bubblewrap.attr('imgsrc');
+        $(this).bind('mouseenter', function (event) {
+            if (isLoading) {
+                
+                return;
+            }
+            var $bubbleWrap = $(this);
+            showLoading();
+            var src = $bubbleWrap.attr('imgsrc');
             var div = "<div id='temp_pic_div' class='temp_pic_div' style='position: absolute; z-index:1000;display: none;'></div>";
             $('.temp_pic_div').remove();
             $('body').append(div);
 
-            //html宽高
+            //window width and height
             var winHeight = $(window).height();
             var winWidth = $(window).width();
 
-            //光标位置
+            //cursor x y
             var x = event.clientX;
             var y = event.clientY;
 
-            //显示展开效果
+            //show expand effect
             var expandEffect = function () {
-
-                //图片实际展示宽高
+                hideLoading();
+                //image's width and height to show
                 var picHeight = getPicShowHeight(src, setting.maxWidth, setting.maxHeight);
                 var picWidth = getPicShowWidth(src, setting.maxWidth, setting.maxHeight);
-                $('#temp_pic_div img').css({
+                $('.temp_pic_div img').css({
                     width: picWidth,
                     height: picHeight
                 });
-
-                //计算x，y偏差值
+                //calculate fixed value of x y
                 var commonFixed = 5;
                 var XRightFixed = winWidth - picWidth/2 - x - commonFixed;
                 var YBottomFixed = winHeight - picHeight/2 - y - commonFixed;
@@ -86,15 +121,14 @@ jQuery.fn.imgBubbles = function(options){
                 }, setting.speed);
             };
 
-            //插入img 
+            //insert image
             var img = new Image();
             img.onload = expandEffect;
             img.src = src;
             
-            $('#temp_pic_div').html(img);
+            $('.temp_pic_div').html(img);
 
         });
-
     });
 
 };
