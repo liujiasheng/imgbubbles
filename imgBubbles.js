@@ -5,8 +5,10 @@ jQuery.fn.imgBubbles = function(options){
         maxWidth: 300,
         maxHeight: 300,
         speed:'fast',
-        showLoading: true, //show loading icon or not
-        loadingImgSrc: 'images/loading.gif'
+        showLoading: true,  //show loading icon or not
+        showFail: true,     //show loading fail icon or not
+        loadingImgSrc: 'images/loading.gif',
+        failImgSrc: 'images/error.png'
     }, options); //merge options with default settings
 
     var isLoading = false;
@@ -34,19 +36,26 @@ jQuery.fn.imgBubbles = function(options){
     var showLoading = function ($obj) {
         isLoading = true;
         if (setting.showLoading) {
-            var loadingDiv = '<div class="imgBubbleLoading"></div>';
+            var loadingDiv = '<div class="imgBubbleNotice"></div>';
             $obj.append(loadingDiv);
             var img = new Image();
             img.src = setting.loadingImgSrc;
-            $('.imgBubbleLoading').html(img);
+            $('.imgBubbleNotice').html(img);
         }
     };
     var hideLoading = function ($obj) {
         isLoading = false;
-        $('.imgBubbleLoading').remove();
+        $('.imgBubbleNotice').remove();
     };
-    var showFail = function () {
-        
+    var showFail = function ($obj) {
+        isLoading = true;
+        if (setting.showFail) {
+            var loadingDiv = '<div class="imgBubbleNotice"></div>';
+            $obj.append(loadingDiv);
+            var img = new Image();
+            img.src = setting.failImgSrc;
+            $('.imgBubbleNotice').html(img);
+        }
     };
     
     $('.imgBubbleExpand').live('mouseleave', function () {
@@ -111,11 +120,15 @@ jQuery.fn.imgBubbles = function(options){
             //insert image
             var img = new Image();
             img.onload = expandEffect;
+            img.onerror = function () { showFail($bubbleWrap) };
             img.src = src;
             
             $('.imgBubbleExpand').html(img);
 
         });
+        $(this).bind('mouseleave', function (event) {
+            hideLoading($(this));
+        })
     });
 
 };
