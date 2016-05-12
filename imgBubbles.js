@@ -31,52 +31,39 @@ jQuery.fn.imgBubbles = function(options){
         }
         return picWidth;
     };
-    var showLoading = function () {
+    var showLoading = function ($obj) {
         isLoading = true;
-        $('.imgBubbleLoading').show();
+        if (setting.showLoading) {
+            var loadingDiv = '<div class="imgBubbleLoading"></div>';
+            $obj.append(loadingDiv);
+            var img = new Image();
+            img.src = setting.loadingImgSrc;
+            $('.imgBubbleLoading').html(img);
+        }
     };
-    var hideLoading = function () {
+    var hideLoading = function ($obj) {
         isLoading = false;
-        $('.imgBubbleLoading').hide();
+        $('.imgBubbleLoading').remove();
     };
     var showFail = function () {
         
     };
     
-    if (setting.showLoading) {
-        var loadingDiv = '<div class="imgBubbleLoading" id="imgBubbleLoading" style="display: none; position: absolute"></div>';
-        $('body').append(loadingDiv);
-        var img = new Image();
-        img.src = setting.loadingImgSrc;
-        $('.imgBubbleLoading').html(img);
-
-        var GetMouse = function(event) {
-            var x = event.clientX - 8;
-            var y = event.clientY - 8;
-            document.getElementById("imgBubbleLoading").style.left = x + "px";
-            document.getElementById("imgBubbleLoading").style.top = y + "px";
-        };
-        $('body').bind('mousemove', function(event){
-            GetMouse(event);
-        });
-    }
-    
-    $('.temp_pic_div').live('mouseleave', function () {
-        $('.temp_pic_div').remove();
+    $('.imgBubbleExpand').live('mouseleave', function () {
+        $('.imgBubbleExpand').remove();
     });
 
     return this.each(function() { //return jQuery obj
-
+        $(this).addClass('imgBubble');
         $(this).bind('mouseenter', function (event) {
             if (isLoading) {
-                
                 return;
             }
             var $bubbleWrap = $(this);
-            showLoading();
+            showLoading($bubbleWrap);
             var src = $bubbleWrap.attr('imgsrc');
-            var div = "<div id='temp_pic_div' class='temp_pic_div' style='position: absolute; z-index:1000;display: none;'></div>";
-            $('.temp_pic_div').remove();
+            var div = "<div id='imgBubbleExpand' class='imgBubbleExpand'></div>";
+            $('.imgBubbleExpand').remove();
             $('body').append(div);
 
             //window width and height
@@ -89,11 +76,11 @@ jQuery.fn.imgBubbles = function(options){
 
             //show expand effect
             var expandEffect = function () {
-                hideLoading();
+                hideLoading($bubbleWrap);
                 //image's width and height to show
                 var picHeight = getPicShowHeight(src, setting.maxWidth, setting.maxHeight);
                 var picWidth = getPicShowWidth(src, setting.maxWidth, setting.maxHeight);
-                $('.temp_pic_div img').css({
+                $('.imgBubbleExpand img').css({
                     width: picWidth,
                     height: picHeight
                 });
@@ -108,7 +95,7 @@ jQuery.fn.imgBubbles = function(options){
                 if (XLeftFixed < 0) { x -= XLeftFixed; }
                 if (YTopFixed < 0) { y -= YTopFixed; }
                 
-                $('.temp_pic_div').show().css({
+                $('.imgBubbleExpand').show().css({
                     left: (parseInt(x)) + "px",
                     top: (parseInt(y)) + "px",
                     width: '1px',
@@ -126,7 +113,7 @@ jQuery.fn.imgBubbles = function(options){
             img.onload = expandEffect;
             img.src = src;
             
-            $('.temp_pic_div').html(img);
+            $('.imgBubbleExpand').html(img);
 
         });
     });
