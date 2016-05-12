@@ -72,7 +72,7 @@ jQuery.fn.imgBubbles = function(options){
                 var YTopFixed = y - picHeight / 2 - commonFixed;
                 if (XLeftFixed < 0) { x -= XLeftFixed; }
                 if (YTopFixed < 0) { y -= YTopFixed; }
-                console.log('expand');
+                
                 $('.temp_pic_div').show().css({
                     left: (parseInt(x)) + "px",
                     top: (parseInt(y)) + "px",
@@ -90,9 +90,7 @@ jQuery.fn.imgBubbles = function(options){
             var img = new Image();
             img.onload = expandEffect;
             img.src = src;
-            //img.width = picWidth;
-            //img.height = picHeight;
-
+            
             $('#temp_pic_div').html(img);
 
         });
